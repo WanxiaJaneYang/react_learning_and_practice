@@ -53,10 +53,74 @@ function formatDate(time) {
 }
 
 function App() {
+  //默认active值为"hot"
   const [active, setActive] = useState("hot")
-
+  const [state, setState] = useState({
+    tabs: [
+      {
+        id: 1,
+        name: '热度',
+        type: 'hot',
+        active: true
+      },
+      {
+        id: 2,
+        name: '时间',
+        type: 'time',
+        active: false
+      }
+    ],
+    list: [
+      {
+        id: 1,
+        author: '刘德华',
+        comment: '给我一杯忘情水',
+        time: new Date('2021-10-10 09:09:00'),
+        // 1: 点赞 0：无态度 -1:踩
+        attitude: 1
+      },
+      {
+        id: 2,
+        author: '周杰伦',
+        comment: '哎哟，不错哦',
+        time: new Date('2021-10-11 09:09:00'),
+        // 1: 点赞 0：无态度 -1:踩
+        attitude: 0
+      },
+      {
+        id: 3,
+        author: '五月天',
+        comment: '不打扰，是我的温柔',
+        time: new Date('2021-10-11 10:09:00'),
+        // 1: 点赞 0：无态度 -1:踩
+        attitude: -1
+      }]
+  })
+  //通过点击对应type改变active取值
   function handleSortClick(type) {
     setActive(type);
+  }
+
+  function handleFavorClick(id) {
+    const updateState = { ...state }
+    const index = updateState.list.findIndex(comment => comment.id === id)
+    if (updateState.list[index].attitude === 1) {
+      updateState.list[index].attitude = 0
+    } else {
+      updateState.list[index].attitude = 1
+    }
+    setState(updateState)
+  }
+
+  function handleHateClick(id) {
+    const updateState = { ...state }
+    const index = updateState.list.findIndex(comment => comment.id === id)
+    if (updateState.list[index].attitude === -1) {
+      updateState.list[index].attitude = 0
+    } else {
+      updateState.list[index].attitude = -1
+    }
+    setState(updateState)
   }
 
   return (
@@ -69,7 +133,9 @@ function App() {
         {/* 排序 */}
         <div className="tabs-order">
           <ul className="sort-container">{
+            //用map 列出两个tab(按热度排序和按时间排序)，点击对应tab会改变active值
             state.tabs.map(sort => (
+              //如果不写()=>就丧失作用
               <li onClick={() => handleSortClick(sort.type)} key={sort.id} className={sort.type === active ? "on" : ""}>按{sort.name}排序</li>
             ))
           }
@@ -108,10 +174,10 @@ function App() {
                 <p className="text">{item.comment}</p>
                 <div className="info">
                   <span className="time">{formatDate(item.time)}</span>
-                  <span className={item.attitude === 1 ? "like liked" : "like"}>
+                  <span onClick={() => handleFavorClick(item.id)} className={item.attitude === 1 ? "like liked" : "like"}>
                     <i className="icon" />
                   </span>
-                  <span className={item.attitude === -1 ? "hate hated" : "hate"}>
+                  <span onClick={() => handleHateClick(item.id)} className={item.attitude === -1 ? "hate hated" : "hate"}>
                     <i className="icon" />
                   </span>
                   <span className="reply btn-hover">删除</span>
